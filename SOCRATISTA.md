@@ -1,8 +1,11 @@
 # Step 9 — what to paste into Socratista
 
 **Links to your work**
-1. `https://<your-project>.vercel.app`
-2. `+ Add link` → `https://github.com/<you>/pipeline`
+1. `https://pipeline-indol-gamma.vercel.app`
+2. `+ Add link` → `https://github.com/falamiieu2024-lgtm/pipeline`
+
+Both verified live on 10 Oct 2026: the app opens with no Vercel login wall, and the
+repository is public with no `.env.local` in it.
 
 **Summary of what you did** — paste this, then fill the last line yourself.
 
