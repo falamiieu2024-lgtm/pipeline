@@ -36,6 +36,15 @@ They identified the product, the user and the call to action correctly on first 
 
 Privacy is enforced in the database, not in the browser. Row Level Security is ON for the applications table, with select/insert/update/delete policies keyed on auth.uid(). A request carrying only the public anon key returns an empty array, and an anonymous insert is refused with "new row violates row-level security policy for table applications". Nothing is filtered client-side.
 
+Edge cases I checked beyond the eight:
+- Signing up with an email that already exists: the form stays on /signup and shows "User already registered". No session is issued, so an existing account cannot be taken over by re-registering it.
+- Opening /app directly while logged out: the user is sent to /login, not shown an empty app.
+- Anonymous update and delete against the table, using only the public key: both return success with zero rows affected, because Row Level Security filters them to nothing. I logged back in afterwards and the row was still there, still marked waiting, which confirms nothing was silently changed or removed.
+
+How it is built. Next.js (App Router) deployed on Vercel, with Supabase for authentication and Postgres. Only the project URL and the publishable (anon) key ever reach the browser; the secret/service_role key is not used anywhere in the app, is not in the repository, and is not in the Vercel environment. Local keys live in .env.local, which is listed in .gitignore and has never been committed — the public repository contains no credentials.
+
+What I would test next. The five-second test suggested status should be its own field rather than free text, and I shipped that. The honest way to know whether it was right is to compare how many rows each user saves, and how many they come back to update, in the weeks before and after the change. With five users that is too small a sample to conclude anything yet, so I am treating it as a hypothesis rather than a result.
+
 Grading contract: /app exposes core-input (an input of type="text"), core-submit and core-item, and the auth pages expose signup-email, signup-password, signup-submit, login-email, login-password, login-submit and logout, spelled exactly as specified. Saving works with core-input alone; there are no other required fields.
 ```
 
