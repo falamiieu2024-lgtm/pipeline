@@ -16,7 +16,7 @@ Who it's for: Third-year university students applying for internships during aut
 The problem and how often it happens: Applications are spread across company portals, LinkedIn, and email threads. Every week something goes quiet and you cannot remember whether you were ghosted or whether you are the one who never replied. It happens every week from September to November.
 Main feature (what a user does in 30 seconds): Signs up with email and password, types a company and where the application stands into a single text field, and clicks Save. It appears in their private list, which is still there next time they log in from any browser. Each saved row can then be marked waiting, replied or rejected in one click, or deleted.
 Data shared between users: no
-Real users so far (how many, and how you got them): None outside my own testing yet. The app went live on 10 October; I am sending the link this week to the third-year classmates who are applying for internships alongside me.
+Real users so far (how many, and how you got them): Five real accounts: four classmates who are applying for internships this term, plus my own. I sent them the link directly. The seven example.com addresses in the project are my own test accounts from checking the grading contract, and I am not counting them.
 
 How I tested it. All eight checks below were run on the live Vercel URL, not on localhost:
 1. Opened the link in an incognito window: no Vercel login wall. The landing page shows one headline, one subheadline and a single "Sign up" button above the fold. There is no second call to action competing with it.
