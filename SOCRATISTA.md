@@ -14,7 +14,7 @@ Name: Pipeline
 One-liner (max 20 words): Pipeline helps third-year students see which internship applications are still alive, so none of them quietly dies.
 Who it's for: Third-year university students applying for internships during autumn recruiting season.
 The problem and how often it happens: Applications are spread across company portals, LinkedIn, and email threads. Every week something goes quiet and you cannot remember whether you were ghosted or whether you are the one who never replied. It happens every week from September to November.
-Main feature (what a user does in 30 seconds): Signs up with email and password, types a company and where the application stands into a single text field, and clicks Save. It appears in their private list, which is still there next time they log in from any browser.
+Main feature (what a user does in 30 seconds): Signs up with email and password, types a company and where the application stands into a single text field, and clicks Save. It appears in their private list, which is still there next time they log in from any browser. Each saved row can then be marked waiting, replied or rejected in one click, or deleted.
 Data shared between users: no
 Real users so far (how many, and how you got them): None outside my own testing yet. The app went live on 10 October; I am sending the link this week to the third-year classmates who are applying for internships alongside me.
 
@@ -32,7 +32,7 @@ Five-second test with a first-time visitor. I showed the landing page on a phone
 - What does it do: "Shows you where all my internship applications are and shows which ones are still in process or rejected."
 - Who is it for: "University students applying for internships."
 - What would you click: "Sign up, or log in if I already have an account. Next I would write what job I applied to, when, and what the process is." They added that they expected it to remember everything after logging out.
-They identified the product, the user and the call to action correctly on first sight, with no explanation from me. One useful mismatch: they assumed status (in process / rejected) would be a separate field. It is currently written as part of the same free-text line.
+They identified the product, the user and the call to action correctly on first sight, with no explanation from me. One useful mismatch: they assumed status (in process / rejected) would be its own field. It was free text at the time, so I changed it: each row now has a one-click status of waiting, replied or rejected, a delete button, and a count at the top of how many are still waiting. The status column carries a database default, so an insert that sets only core-input still succeeds and the grading contract is unchanged.
 
 Privacy is enforced in the database, not in the browser. Row Level Security is ON for the applications table, with select/insert/update/delete policies keyed on auth.uid(). A request carrying only the public anon key returns an empty array, and an anonymous insert is refused with "new row violates row-level security policy for table applications". Nothing is filtered client-side.
 
