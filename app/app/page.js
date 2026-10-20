@@ -4,6 +4,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabase } from '../../lib/supabase'
 
+const STATUSES = [
+  { key: 'waiting', label: 'Waiting' },
+  { key: 'replied', label: 'Replied' },
+  { key: 'rejected', label: 'Rejected' },
+]
+
 export default function AppPage() {
   const router = useRouter()
 
@@ -17,7 +23,7 @@ export default function AppPage() {
     // Row Level Security means this only ever returns the logged-in user's rows.
     const { data, error } = await getSupabase()
       .from('applications')
-      .select('id, content, created_at')
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -65,6 +71,8 @@ export default function AppPage() {
       return
     }
 
+    // Only content and user_id are sent. status takes its database default,
+    // so saving works with the text field alone.
     const { error } = await getSupabase()
       .from('applications')
       .insert({ content, user_id: userId })
@@ -78,6 +86,31 @@ export default function AppPage() {
     setText('')
     await load()
     setBusy(false)
+  }
+
+  async function setStatus(id, status) {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)))
+
+    const { error } = await getSupabase()
+      .from('applications')
+      .update({ status })
+      .eq('id', id)
+
+    if (error) {
+      setError(error.message)
+      await load()
+    }
+  }
+
+  async function remove(id) {
+    setItems((prev) => prev.filter((i) => i.id !== id))
+
+    const { error } = await getSupabase().from('applications').delete().eq('id', id)
+
+    if (error) {
+      setError(error.message)
+      await load()
+    }
   }
 
   async function onLogout() {
@@ -94,21 +127,26 @@ export default function AppPage() {
     )
   }
 
+  const statusOf = (item) => item.status ?? 'waiting'
+  const count = (key) => items.filter((i) => statusOf(i) === key).length
+
   return (
     <main className="wrap">
       <div className="topbar">
         <span className="brand">Pipeline</span>
-        <button
-          data-testid="logout"
-          type="button"
-          className="btn-quiet"
-          onClick={onLogout}
-        >
+        <button data-testid="logout" type="button" className="btn-quiet" onClick={onLogout}>
           Log out
         </button>
       </div>
 
       <h2>Your applications</h2>
+
+      {items.length > 0 ? (
+        <p className="tally">
+          <strong>{count('waiting')} still waiting</strong>
+          <span> · {count('replied')} replied · {count('rejected')} rejected</span>
+        </p>
+      ) : null}
 
       {error ? <p className="error">{error}</p> : null}
 
@@ -131,22 +169,40 @@ export default function AppPage() {
       </form>
 
       {items.length === 0 ? (
-        <p className="empty">
-          Nothing here yet. Add the last company you applied to.
-        </p>
+        <p className="empty">Nothing here yet. Add the last company you applied to.</p>
       ) : (
-        <>
-          <ul className="items">
-            {items.map((item) => (
-              <li key={item.id} data-testid="core-item">
-                {item.content}
-              </li>
-            ))}
-          </ul>
-          <p className="count">
-            {items.length} application{items.length === 1 ? '' : 's'} tracked
-          </p>
-        </>
+        <ul className="items">
+          {items.map((item) => (
+            <li key={item.id} className={`item is-${statusOf(item)}`}>
+              <span data-testid="core-item">{item.content}</span>
+
+              <div className="row-controls">
+                <div className="pills" role="group" aria-label="Status">
+                  {STATUSES.map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      className={`pill${statusOf(item) === s.key ? ' on' : ''}`}
+                      aria-pressed={statusOf(item) === s.key}
+                      onClick={() => setStatus(item.id, s.key)}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="remove"
+                  aria-label={`Delete ${item.content}`}
+                  onClick={() => remove(item.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </main>
   )

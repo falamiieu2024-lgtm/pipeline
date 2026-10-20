@@ -6,6 +6,8 @@ create table if not exists public.applications (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users (id) on delete cascade,
   content     text not null,
+  status      text not null default 'waiting'
+                check (status in ('waiting', 'replied', 'rejected')),
   created_at  timestamptz not null default now()
 );
 
